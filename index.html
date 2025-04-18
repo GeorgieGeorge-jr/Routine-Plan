@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Grind Master</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header with dynamic greeting -->
+        <header class="app-header">
+            <h1 id="greeting">Good <span id="time-of-day">Morning</span>, <span id="username">Champ</span>!</h1>
+            <div class="header-controls">
+                <button id="settings-btn" aria-label="Settings"><i class="fas fa-cog"></i></button>
+                <button id="history-btn" aria-label="View History"><i class="fas fa-chart-line"></i></button>
+            </div>
+        </header>
+        git config user.name "George"
+git config user.email "georgejnr31@gmail.com"
+
+
+        <!-- Progress Overview -->
+        <section class="progress-overview">
+            <div class="progress-circle">
+                <svg viewBox="0 0 36 36" class="circular-chart">
+                    <path class="circle-bg" d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <path class="circle-fill" stroke-dasharray="0, 100" d="M18 2.0845
+                        a 15.9155 15.9155 0 0 1 0 31.831
+                        a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                    <text x="18" y="20.5" class="percentage">0%</text>
+                </svg>
+            </div>
+            <div class="progress-stats">
+                <h3>Today's Progress</h3>
+                <p><span id="completed-count">0</span> of <span id="total-tasks">0</span> tasks completed</p>
+                <p id="motivational-quote">"Small daily improvements lead to stunning results."</p>
+            </div>
+        </section>
+
+        <!-- Time and Date Display -->
+        <section class="time-display">
+            <div class="current-time" id="current-time">--:-- --</div>
+            <div class="current-date" id="current-date">Day, Month DD, YYYY</div>
+        </section>
+
+        <!-- Task Categories -->
+        <div class="task-categories">
+            <button class="category-btn active" data-category="all">All Tasks</button>
+            <button class="category-btn" data-category="morning">Morning</button>
+            <button class="category-btn" data-category="midday">Midday</button>
+            <button class="category-btn" data-category="evening">Evening</button>
+        </div>
+
+        <!-- Task List -->
+        <section class="task-list-container">
+            <ul class="task-list" id="task-list">
+                <!-- Tasks will be dynamically inserted here -->
+            </ul>
+        </section>
+
+        <!-- Music Player (Spotify Web Playback SDK) -->
+        <section class="music-player" id="music-player">
+            <div class="player-header">
+                <h3>Focus Soundtrack</h3>
+                <button id="toggle-player"><i class="fas fa-chevron-down"></i></button>
+            </div>
+            <div class="player-content">
+                <div class="player-controls">
+                    <button id="prev-track"><i class="fas fa-step-backward"></i></button>
+                    <button id="play-pause"><i class="fas fa-play"></i></button>
+                    <button id="next-track"><i class="fas fa-step-forward"></i></button>
+                </div>
+                <div class="track-info">
+                    <p id="track-name">Not Connected</p>
+                    <p id="track-artist">Select a playlist below</p>
+                </div>
+                <div class="playlist-selector">
+                    <button class="playlist-btn" data-playlist="focus">Deep Focus</button>
+                    <button class="playlist-btn" data-playlist="lofi">Lofi Coding</button>
+                    <button class="playlist-btn" data-playlist="classical">Classical</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Daily Reflection -->
+        <section class="daily-reflection">
+            <h3>Daily Reflection</h3>
+            <div class="reflection-inputs">
+                <div class="reflection-item">
+                    <label>3 Things I Learned Today</label>
+                    <textarea id="learned-today" placeholder="Type here..."></textarea>
+                </div>
+                <div class="reflection-item">
+                    <label>3 Things to Improve</label>
+                    <textarea id="improve-today" placeholder="Type here..."></textarea>
+                </div>
+            </div>
+            <button id="save-reflection">Save Reflection</button>
+        </section>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="notification-toast" id="notification-toast">
+        <div class="toast-content"></div>
+    </div>
+
+    <script src="script.js"></script>
+    <!-- Spotify Web Playback SDK -->
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+</body>
+</html>

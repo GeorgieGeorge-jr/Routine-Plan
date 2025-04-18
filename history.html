@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Grind Master - Progress History</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Your Progress History</h1>
+            <div class="header-controls">
+                <button id="back-btn" aria-label="Back to Dashboard"><i class="fas fa-arrow-left"></i></button>
+            </div>
+        </header>
+
+        <section class="history-overview">
+            <div class="stats-card">
+                <h3>7-Day Average</h3>
+                <div class="stat-value" id="weekly-average">--%</div>
+            </div>
+            <div class="stats-card">
+                <h3>30-Day High</h3>
+                <div class="stat-value" id="monthly-high">--%</div>
+            </div>
+            <div class="stats-card">
+                <h3>Current Streak</h3>
+                <div class="stat-value" id="current-streak">0 days</div>
+            </div>
+        </section>
+
+        <section class="progress-chart">
+            <h3>Your Progress Over Time</h3>
+            <canvas id="progressChart"></canvas>
+        </section>
+
+        <section class="reflection-history">
+            <h3>Recent Reflections</h3>
+            <div class="reflection-list" id="reflection-list">
+                <!-- Reflections will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Load and display history data
+        document.addEventListener('DOMContentLoaded', function() {
+            // Back button functionality
+            document.getElementById('back-btn').addEventListener('click', function() {
+                window.location.href = 'index.html';
+            });
+
+            // Load history data
+            const history = JSON.parse(localStorage.getItem('dailyGrindHistory') || [];
+            const reflections = JSON.parse(localStorage.getItem('dailyGrindReflections') || [];
+
+            // Calculate stats
+            calculateStats(history);
+            
+            // Render chart
+            renderProgressChart(history);
+            
+            // Render reflections
+            renderReflections(reflections);
+        });
+
+        // Calculate and display statistics
+        function calculateStats(history) {
+            if (history.length === 0) return;
+
+            // Get last 7 days (including today)
+            const last7Days = history.slice(-7);
+            const weeklyAverage = Math.round(last7Days.reduce((sum, day) => sum + day.progress, 0) / last7Days.length;
+            document.getElementById('weekly-average').textContent = ${weeklyAverage}%;
+
+            // Get last 30 days
+            const last30Days = history.slice(-30);
+            const monthlyHigh = Math.max(...last30Days.map(day => day.progress));
+            document.getElementById('monthly-high').textContent = ${monthlyHigh}%;
+
+            // Calculate current streak
+            let streak = 0;
+            const today = new Date().toISOString().split('T')[0];
+            const todayProgress = history.find(day => day.date === today);
+            
+            if (todayProgress && todayProgress.progress > 0) {
+                streak++;
+                for (let i = history.length - 2; i >= 0; i--) {
+                    const prevDate = new Date(history[i].date);
+                    const nextDate = new Date(history[i+1].date);
+                    const dayDiff = (nextDate - prevDate) / (1000 * 60 * 60 * 24);
+                    
+                    if (dayDiff === 1 && history[i].progress > 0) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                }
+            }
+            
+            document.getElementById('current-streak').textContent = ${streak} day${streak !== 1 ? 's' : ''};
+        }
+
+        // Render progress chart
+        function renderProgressChart(history) {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            
+            // Prepare data
+            const labels = history.map(entry => {
+                const date = new Date(entry.date);
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            });
+            
+            const progressData = history.map(entry => entry.progress);
+            
+            // Create chart
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Daily Progress',
+                        data: progressData,
+                        backgroundColor: 'rgba(67, 97, 238, 0.2)',
+                        borderColor: 'rgba(67, 97, 238, 1)',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + '% completed';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Render reflection history
+        function renderReflections(reflections) {
+            const reflectionList = document.getElementById('reflection-list');
+            
+            if (reflections.length === 0) {
+                reflectionList.innerHTML = '<p class="no-reflections">No reflections yet. Start reflecting on your daily progress!</p>';
+                return;
+            }
+            
+            // Show only the last 5 reflections
+            const recentReflections = reflections.slice(-5).reverse();
+            
+            reflectionList.innerHTML = recentReflections.map(reflection => `
+                <div class="reflection-card">
+                    <div class="reflection-date">${new Date(reflection.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                    <div class="reflection-content">
+                        <div class="reflection-section">
+                            <h4>Things I Learned:</h4>
+                            <p>${reflection.learned || '<em>No entry</em>'}</p>
+                        </div>
+                        <div class="reflection-section">
+                            <h4>Things to Improve:</h4>
+                            <p>${reflection.improve || '<em>No entry</em>'}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
